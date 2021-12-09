@@ -1,0 +1,21 @@
+{
+    "name": "techdivision/my-sitepackage",
+    "type": "typo3-cms-extension",
+    "description": "",
+    "homepage": "https://www.techdivision.com",
+    "license": ["GPL-2.0-or-later"],
+    "keywords": ["TYPO3 CMS"],
+    "require": {
+        "bk2k/bootstrap-package": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Techdivision\\MySitepackage\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "my_sitepackage"
+        }
+    }
+}
