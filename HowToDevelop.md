@@ -6,6 +6,4 @@
 
 ```bash
 ddev start
-ddev import-files --src=./backup/fileadmin
-ddev import-db --src=./backup/db.sql.gz
 ```

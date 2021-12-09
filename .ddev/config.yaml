@@ -194,3 +194,9 @@ mailhog_port: "8125"
 #hooks:
 #  post-start:
 #    - exec: composer install -d /var/www/html
+
+hooks:
+  post-start:
+    - composer: "install"
+    - exec-host: "ddev import-files --src=./backup/fileadmin"
+    - exec-host: "ddev import-db --src=./backup/db.sql.gz"
