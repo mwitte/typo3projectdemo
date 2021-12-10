@@ -1,0 +1,103 @@
+# Example for a .gitlab-ci.yml
+stages:
+  - build
+  - deploy
+  - provision
+  - ci
+
+# creates an artefact: git tag <version>.<version>.<version>
+# example: git tag 1.2.3
+build-release:
+  stage: build
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/build-release.yml
+  only:
+    - /^[0-9]+\.[0-9]+\.[0-9]+$/
+  artifacts:
+    name: "release-${CI_BUILD_TAG}"
+    expire_in: 3 years
+    paths:
+      - dist/
+
+# deploys a release(artefact) to defined target systems: git tag /deploy/<target-system>/<artefact>
+# example: git tag /deploy/test/1.2.3
+deploy-release:
+  stage: deploy
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/deploy-release.yml
+  only:
+    - /^deploy\/.*\/.*$/
+
+
+# provisioning a (new) instance: git tag provision/<target-system>/<on-going-number>
+# example: git tag provision/test/2
+provision-instance:
+  stage: provision
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/trigger-provision-instance.yml
+  only:
+    - /^provision\/.*\/.*$/
+
+# destroys an instance: git tag destroy/<target-system>/<on-going-number>
+# example: git tag destroy/test/1
+destroy-instance:
+  stage: provision
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/trigger-instance-destroy.yml
+  only:
+    - /^destroy\/.*\/.*$/
+
+# restores data from a backup onto target system: git tag restore/<target-system>/<ongoing-number>
+# example: git tag restore/test/4
+restore-instance:
+  stage: ci
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/trigger-instance-restore.yml
+  only:
+    - /^restore\/.*\/.*$/
+
+# sets up general settings on gitlab group level like basic auth, mailhog etc: setup/<ongoing-number>
+# example: git tag setup/4
+setup-project:
+  stage: ci
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/trigger-setup-project.yml
+  only:
+    - /^setup\/.*$/
+
+# creates a new backup of a system which can later be used for restoring: git tag instance-backup/<system>/<ongoing-number>
+# example: git tag instance-backup/production/6
+instance-backup:
+  stage: ci
+  tags:
+    - ci
+  before_script:
+    - cd /opt/ansible-cms
+  script:
+    - ansible-playbook playbooks/trigger-instance-backup.yml
+  only:
+    - /^instance-backup\/.*\/.*$/
